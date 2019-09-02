@@ -1,9 +1,12 @@
 body {
-    background-image: url(background3.jpg);
+
     font-family: "Helvetica Neue", Helvetica, Arial;
     padding-top: 20px;
+	
 }
-
+body.success{
+		    background-image: url(background3.jpg);
+	}
 .container {
     width: 406px;
     max-width: 406px;

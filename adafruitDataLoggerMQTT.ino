@@ -328,6 +328,8 @@ void setup() {
   Serial.print("Open http://");
   Serial.print(host);
   Serial.println(".local to see the home page");
+  Serial.print("IP Address://");
+  Serial.print(WiFi.localIP());
   espServer.onNotFound([]() {
     if (!handleFileRead(espServer.uri())) {
       espServer.send(404, "text/plain", "FileNotFound");
@@ -429,9 +431,9 @@ void response() {
     Serial.print("submit arg:\t");
     Serial.println(espServer.arg("submit"));
   }
-  // Check if the api key not null and not more than 20 char.
+  // Check if the api key not null and not more than 40 char.
   if (espServer.hasArg("apiKey") && (espServer.arg("apiKey").length() > 0)) {
-    if ((espServer.arg("apiKey").length() > 20)) {
+    if ((espServer.arg("apiKey").length() > 40)) {
       return espServer.send(500, "text/plain", "BAD ARGS");
     }
     Serial.print("User entered:\t");
