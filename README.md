@@ -7,18 +7,18 @@
 ## External Libraries
 ### Wifi Manager
 
-We use wifi manager library by tzapu to manage the changes in the WiFi settings (SSID and Password). So thanks to tzapu. To install wifi manager library.
+We use wifi manager library by tzapu to manage the changes in the WiFi settings (SSID and Password). So thanks to tzapu. To install wifi manager [library](https://github.com/tzapu/WiFiManager).
 ### DHTesp
 
-We use DHTesp library file by “beegee Tokyo” to read the temperature and humidity easily from DHT11 sensor, thanks to beegee Tokyo. To install DHTesp library
+We use DHTesp library file by “beegee Tokyo” to read the temperature and humidity easily from DHT11 sensor, thanks to beegee Tokyo. To install DHTesp [library](https://github.com/beegee-tokyo/DHTesp).
 
 ### ArduinoJson
 
-You can install ArduinoJson from this link
+We use andruino json library by Benoît Blanchon to create and read the configration file in the SPIFFS, Benoît Blanchon thank you. To install ArduinoJson [library](https://github.com/bblanchon/ArduinoJson).
 
 ### Adafruit_MQTT_Library﻿
 
- Install the adafruit MQTT library for Arduino from here
+ Last external library we use in this project the adafruit MQTT library by Adafruit, big thanks to Adafruit. To Install the adafruit MQTT library for [Arduino](https://github.com/adafruit/Adafruit_MQTT_Library).
  
 ## How It Works
 
@@ -33,7 +33,7 @@ To run the code you need to:
  4.	Install the adafruit MQTT library from [github](https://github.com/adafruit/Adafruit_MQTT_Library). Or in Manage libraries type adafruit MQTT in the search bar and install it.
  5. Upload the html files in the data folder to the SPIFFS by clicking “ESP8266 sketch data upload” from the tools menu – be sure that the serial window is closed- this will add the control settings page to the ESP8266 web server.
 
-For more details check our [blog post]()
+For more details check our [blog post](https://www.the-diy-life.co/2019/09/03/esp8266-and-adafruit-io/)
 
 ----
 ## thanks
