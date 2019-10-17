@@ -46,7 +46,7 @@ float humidity;
 
 uint addr = 0;
 struct {
-  char apikey[32] = "";
+  char apikey[35] = "";
   int interval = 0;
   unsigned int enable;
 } data;
@@ -239,16 +239,16 @@ bool handleFileRead(String path) {
 
 /************************* WiFi Access Point *********************************/
 
-#define WLAN_SSID       "Focus"
-#define WLAN_PASS       "Focus@Pro"
+//#define WLAN_SSID       "Focus"
+//#define WLAN_PASS       "Focus@Pro"
 
 
 /************************* Adafruit.io Setup *********************************/
 
 #define AIO_SERVER      "io.adafruit.com"
 #define AIO_SERVERPORT  1883                   // use 8883 for SSL
-#define AIO_USERNAME    "Hend_Adel" // (see https://accounts.adafruit.com)..."
-#define AIO_KEY         "c5fcd74ec87646178e4f8f71e63a3ae5"
+#define AIO_USERNAME    "petermagdy" // (see https://accounts.adafruit.com)..."
+#define AIO_KEY         ""
 
 /************ Global State (you don't need to change this!) ******************/
 
@@ -258,14 +258,14 @@ WiFiClient client;
 //WiFiClientSecure client;
 
 // Setup the MQTT client class by passing in the WiFi client and MQTT server and login details.
-Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
-
+//Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
+Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT);
 /****************************** Feeds ***************************************/
 
 // Setup a feed called 'photocell' for publishing.
 // Notice MQTT paths for AIO follow the form: <username>/feeds/<feedname>
-Adafruit_MQTT_Publish temperatureFeed = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/temperatureahumidity.temperature");
-Adafruit_MQTT_Publish humidityFeed = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/temperatureahumidity.humidity");
+Adafruit_MQTT_Publish temperatureFeed = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/esp8266.temperature");
+Adafruit_MQTT_Publish humidityFeed = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/esp8266.humidity");
 
 
 void setup() {
@@ -383,20 +383,21 @@ void loop() {
       humidity = dht.getHumidity();
 
       // Now we can publish stuff!
-      int x = 20;
-      int y = 67;
       Serial.print(F("\nSending temperature val "));
       Serial.print(temperatureC);
       Serial.print("...");
       if (! temperatureFeed.publish(temperatureC)) {
-        Serial.println(F("Failed"));
+        Serial.println(F(" Failed"));
       } else {
-        Serial.println(F("OK!"));
+        Serial.println(F(" OK!"));
       }
+      Serial.print(F("\nSending humidity val "));
+      Serial.print(humidity);
+      Serial.print("...");
       if (! humidityFeed.publish(humidity)) {
-        Serial.println(F("Failed"));
+        Serial.println(F(" Failed"));
       } else {
-        Serial.println(F("OK!"));
+        Serial.println(F(" OK!"));
       }
     }
   }
@@ -438,7 +439,7 @@ void response() {
     }
     Serial.print("User entered:\t");
     Serial.println(espServer.arg("apiKey"));
-    espServer.arg("apiKey").toCharArray(data.apikey, 32);
+    espServer.arg("apiKey").toCharArray(data.apikey, 35);
   }
   else {
     return espServer.send(500, "text/plain", "BAD ARGS");
@@ -454,26 +455,22 @@ void response() {
   }
   // Check for enable status, no check for length here because if it > 0 it will be true all the time.
   if (espServer.hasArg("checky")) {
-    Serial.print("User cecked:\t");
+    Serial.print("User checked:\t");
     Serial.println(espServer.arg("checky"));
     if (espServer.arg("checky") == "0") {
       data.enable = 0;
-      Serial.print("User cecked false: " + data.enable);
+      Serial.print("User checked false: " + data.enable);
     }
     else if (espServer.arg("checky") == "1") {
-      Serial.print("User cecked true: " + data.enable);
+      Serial.print("User checked true: " + data.enable);
       data.enable = 1;
-      Serial.print("User cecked:\t");
+      Serial.print("User checked:\t");
     }
   }
   else {
     data.enable = 0;
-    Serial.print("User cecked false: " + data.enable);
+    Serial.print("User checked false: " + data.enable);
   }
-  struct {
-    String val = "";
-    int interval = 0;
-  } ldata;
 
   // commit 512 bytes of ESP8266 flash (for "EEPROM" emulation)
   // this step actually loads the content (512 bytes) of flash into
@@ -493,7 +490,9 @@ void response() {
   Serial.println("In Response Values are: " + String(data.apikey) + "," + String(data.interval) + "," + String(data.enable));
   //delay(500);
   handleFileRead("/success.htm");
-
+  
+  mqtt.disconnect();
+  mqtt.connect(AIO_USERNAME, data.apikey);
 }
 
 void bindValues() {
@@ -519,9 +518,8 @@ void MQTT_connect() {
   }
 
   Serial.print("Connecting to MQTT... ");
-
   uint8_t retries = 3;
-  while ((ret = mqtt.connect()) != 0) { // connect will return 0 for connected
+  while ((ret = mqtt.connect(AIO_USERNAME, data.apikey)) != 0) { // connect will return 0 for connected
     Serial.println(mqtt.connectErrorString(ret));
     Serial.println("Retrying MQTT connection in 5 seconds...");
     mqtt.disconnect();
